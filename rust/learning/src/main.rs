@@ -1,86 +1,76 @@
 use std::io;
 use rand::Rng;
 
+// Don't pay too much attention, maybe there are some jokes in here...
+// maybe I've put too much "energy" in that thing.
+
 
 fn random_number(n0: i32, n1:i32) -> i32{
     return rand::thread_rng().gen_range(n0..=n1);
 }
 
 
-
 fn guess_the_number(){
-    let l_numbers: String = String::from("-1234567890");
-    let l_numbers = l_numbers.chars().collect::<Vec<_>>();
+    let to_guess: u8 = random_number(0,100) as u8;
+    let mut n: u32 = 0;
 
+    // if you actually want to play, you can remove this line
+    println!("Number to guess is {}", to_guess);
 
-    let to_guess = random_number(1,100) as u8;
-    println!("number to guess: {}", to_guess);
+    let mut input = String::from("");
+    let mut int_input: u8 = 101; // I'm obliged to do this, or to duplicate some code...
+    let mut input_str: &str;
+    
+    while int_input!= to_guess || input==String::from(""){
+        if int_input != 101{
+            if to_guess > int_input{println!("It's more than that. (Just saying...)");}
+            else {println!("I think it's less, but you can try whatever you want.")}
+        }
 
-    println!("Enter a number between 0 and 100: ");
-    let mut input = String::new();
-    io::stdin()
-        .read_line(&mut input)
-        .expect("Failed to read line");
-    let _ = input.trim().replace("\n","");
-
-
-    let mut can_be_int = false;
-    while !can_be_int{
-        can_be_int = true;
-        for c in input.chars(){
-            if !l_numbers.contains(&c){
-                can_be_int = false;
+        input = String::from("");
+        io::stdin().read_line(&mut input).expect("Failed to read line");
+        input_str = input.trim();
+        int_input = match input_str.parse(){
+            Ok(n) => n,
+            Err(_) => {
+                println!("You dumb? Try better...");
+                continue // ends the loop and restart it
             }
+        };
+
+        if int_input>100 {
+            println!("We said that you have to guess between 0 and 100.\n\
+            Maybe the next guess will be less disappointing...");
+            int_input = 101; // at least it's practicle :D
+            continue // ends the loop and restart it
         }
-        if !can_be_int{
-            println!("Don't you know what a number is? Try again.");
-            input = String::from("");
-            io::stdin().read_line(&mut input).expect("Failed to read line");
-            let _ = input.trim();
+        if n==15{
+            println!("You are at 15 tries, turn on your brain");
         }
+        n += 1;
     }
-
-    let mut input_int: u8 = input.trim().parse().unwrap();
-
-    while input_int != to_guess{
-        println!("Your input: {}", input_int);
-        if to_guess > input_int{println!("It's more");}
-        else{println!("It's less");}
-
-        input = String::new();
-        io::stdin()
-            .read_line(&mut input)
-            .expect("Failed to read line");
-        let _ = input.trim();
-        
-        can_be_int = false;
-        while !can_be_int{
-            can_be_int = true;
-            println!("{}", input.len());
-            if input.len() > 0{
-                for c in input.chars(){
-                    if !l_numbers.contains(&c){
-                        can_be_int = false;
-                    }
-                }
-            } else {
-                println!("COUCOU");
-                can_be_int = false;}
-            if !can_be_int {
-                println!("Don't you know what a number is? Try again.");
-                input = String::from("");
-                io::stdin().read_line(&mut input).expect("Failed to read line");
-                let _ = input.trim();
-            }
-        }
-        input_int = input.trim().parse().unwrap();
-    }
-
-    println!("GG! you guessed my number!");
+    
+    println!("You got it! in {} tries.", n);
 }
 
 
-fn main() {
+
+fn examples_for_lists() {
+    // init a list - here are some different ways
+    let v: Vec<i32> = Vec::new(); 
+    println!("{:?}", v);
+    let mut v = vec![1,2,3];
+
+    v.push(5);
+
+    // here is how to lazy-ly print a list
+    println!("{:?}", v);
+}
+
+
+fn main(){
     guess_the_number();
-}
 
+    println!("\n\nSome example of lists:");
+    examples_for_lists(); // it's to not get the warning while compiling.
+}
