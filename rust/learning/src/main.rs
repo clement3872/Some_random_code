@@ -4,9 +4,8 @@ use rand::Rng;
 // Don't pay too much attention, maybe there are some jokes in here...
 // maybe I've put too much "energy" in that thing.
 
-
-fn random_number(n0: i32, n1:i32) -> i32{
-    return rand::thread_rng().gen_range(n0..=n1);
+fn random_number(n0:i32, n1:i32) -> i32{
+    rand::thread_rng().gen_range(n0..=n1)
 }
 
 
@@ -21,7 +20,7 @@ fn guess_the_number(){
     let mut int_input: u8 = 101; // I'm obliged to do this, or to duplicate some code...
     let mut input_str: &str;
     
-    while int_input!= to_guess || input==String::from(""){
+    while int_input!= to_guess || input==*""{
         if int_input != 101{
             if to_guess > int_input{println!("It's more than that. (Just saying...)");}
             else {println!("I think it's less, but you can try whatever you want.")}
@@ -74,3 +73,5 @@ fn main(){
     println!("\n\nSome example of lists:");
     examples_for_lists(); // it's to not get the warning while compiling.
 }
+
+
