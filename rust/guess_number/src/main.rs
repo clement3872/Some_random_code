@@ -11,6 +11,7 @@ fn random_number(n0:i32, n1:i32) -> i32{
 }
 
 
+
 fn guess_the_number(){
     let to_guess: u8 = random_number(0,100) as u8;
     let mut n: u32 = 0;
