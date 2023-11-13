@@ -11,10 +11,10 @@ pub struct Tree(Option<Box<Node>>);
 
 /// Internal Node representation with a `value` and the left and right sub-trees.
 #[derive(Debug, PartialEq)]
-pub struct Node {
-    value: i32,
-    left: Tree,
-    right: Tree
+pub struct Node<T:Ord> {
+    value: T,
+    left: Tree<T>,
+    right: Tree<T>,
 }
 
 impl Tree {
@@ -76,8 +76,27 @@ impl Tree {
 
     /// deletes `value` from the tree.
     /// when the value is not found the tree, `false` is returned.
-    pub fn delete(&mut self, value: i32) {
-        panic!("not implemented");
+    pub fn delete(&mut self, value: T) -> bool{
+        let t = self.locate(value);
+        if let Some(&mut node) = t.0 {
+            t.0 = match (&node.left.0, &node.right.0) {
+                (None, None) => None,
+                (None, Some(_)) => node.right.0.take(),
+                (Some(_), None) => node.left.0.take(),
+                (Some(_), Some(_)) => {
+                    let mut new_node = node.left.max_pop();
+                    if let Some(ref mut inside) = new_node{
+                        inside.left.0 = node.left.0.take();
+                        inside.left.0 = node.right.0.take();
+                    }
+                    new_node
+                }
+            };
+            true
+        }
+        else {
+            false
+        }
     }
 }
 
