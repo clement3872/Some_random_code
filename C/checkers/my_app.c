@@ -11,15 +11,15 @@ static unsigned int canvas_width = 100;
 static unsigned int canvas_height = 100;
 static bool draw_square_status = FALSE;
 int array_board[64] = { 
-  0, 2, 0, 2, 0, 2, 0, 2,
+  0, 4, 0, 4, 0, 4, 0, 4,
+  4, 0, 4, 0, 4, 0, 4, 0,
+  0, 4, 0, 4, 0, 4, 0, 4,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
   2, 0, 2, 0, 2, 0, 2, 0,
   0, 2, 0, 2, 0, 2, 0, 2,
-  0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0,
-  1, 0, 1, 0, 1, 0, 1, 0,
-  0, 1, 0, 1, 0, 1, 0, 1,
-  1, 0, 1, 0, 1, 0, 1, 0
-}; // pons: empty => 0; white => 1; black => 2
+  2, 0, 2, 0, 2, 0, 1, 0
+}; // pons: empty => 0; white => 2; black => 4
 
 static void on_quit_clicked (GtkWidget *widget, gpointer data){
   GApplication *app = G_APPLICATION(data); // Cast the user_data to GApplication
@@ -92,37 +92,44 @@ static void clicked_left(GtkGestureClick *gesture, int n_press, double x, double
   printf("Index in a array would be (%d,%d)\n", (int) x/size_x, (int) y/size_y);
 }
 
-
-static void create_board(cairo_t *cr){
+static void display_board(cairo_t *cr){
   const unsigned int size_x = canvas_width / 8;
   const unsigned int size_y = canvas_height / 8;
-  unsigned int pos_x = size_x;
+  unsigned int pos_x = 0;
   unsigned int pos_y = 0;
-  const unsigned int to_center = MIN(size_x, size_y)/2; // ditance between pos_x/pos_y to center of the box
+  const unsigned int to_center_x = size_x/2; // ditance between pos_x to center of the box
+  const unsigned int to_center_y = size_y/2; 
   const unsigned int radius = (int) MIN(size_x, size_y)/2.5;
-  
-  // Set the drawing color to black for the square
+  const unsigned int golden_radius = radius/2; // do differenciate picies that can come back
 
-  for (unsigned int j = 0; j < 8; j++){
-    for (unsigned int i = 0; i < 4; i++){
-      // Draw a square
-      cairo_set_source_rgb(cr, 0, 0, 0);
-      cairo_rectangle(cr, pos_x, pos_y, size_x, size_y);
-      cairo_fill(cr);
-      
-      if (j != 3 && j != 4){
-        // Drawing the disk
-        cairo_set_source_rgb(cr, 0.5, 0.5, 0.5);
-        cairo_arc(cr, pos_x+to_center, pos_y+to_center, radius, 0, 2 * G_PI);
+  int current_pawn;
+  for (int row = 0; row < 8; row++){
+    for (int col = 0; col < 8; col++){
+      if ((row + col) % 2 == 1){
+        cairo_set_source_rgb(cr, 0, 0, 0);
+        cairo_rectangle(cr, pos_x, pos_y, size_x, size_y);
         cairo_fill(cr);
       }
 
-      pos_x += size_x + size_x; // it's faster to do additions than multiplications
-    }
+      current_pawn = array_board[row*8+col];
+      if (current_pawn != 0){
+        if (current_pawn == 4 || current_pawn == 3) 
+          {cairo_set_source_rgb(cr, 0.2, 0.2, 0.2);}
+        else if (current_pawn == 2 || current_pawn == 1) 
+          {cairo_set_source_rgb(cr, 0.7, 0.7, 0.7);}
+        cairo_arc(cr, pos_x+to_center_x, pos_y+to_center_y, radius, 0, 2 * G_PI);
+        cairo_fill(cr);
 
+        if ((current_pawn%2) == 1){
+          cairo_set_source_rgb(cr, 1.0, 0.75, 0.0);
+          cairo_arc(cr, pos_x+to_center_x, pos_y+to_center_y, golden_radius, 0, 2 * G_PI);
+          cairo_fill(cr);
+        }
+      }
+      pos_x += size_x;
+    }
+    pos_x = 0;
     pos_y += size_y;
-    if (j%2 == 0){pos_x = 0;}
-    else {pos_x = size_x;}
   }
 }
 
@@ -133,7 +140,7 @@ static void draw_function(GtkDrawingArea *area, cairo_t *cr, int width, int heig
   cairo_paint(cr); // Paints the current source everywhere within the current clip region.
 
   if (draw_square_status) {
-    create_board(cr);
+    display_board(cr);
   }
 }
 
