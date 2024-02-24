@@ -10,7 +10,16 @@ static cairo_surface_t *surface = NULL;
 static unsigned int canvas_width = 100;
 static unsigned int canvas_height = 100;
 static bool draw_square_status = FALSE;
-int* array_board;
+int array_board[64] = { 
+  0, 2, 0, 2, 0, 2, 0, 2,
+  2, 0, 2, 0, 2, 0, 2, 0,
+  0, 2, 0, 2, 0, 2, 0, 2,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  1, 0, 1, 0, 1, 0, 1, 0,
+  0, 1, 0, 1, 0, 1, 0, 1,
+  1, 0, 1, 0, 1, 0, 1, 0
+}; // pons: empty => 0; white => 1; black => 2
 
 static void on_quit_clicked (GtkWidget *widget, gpointer data){
   GApplication *app = G_APPLICATION(data); // Cast the user_data to GApplication
@@ -149,10 +158,6 @@ void on_app_activate(GApplication *app, gpointer user_data) {
   
   // --- The actual code --- 
 
-  // an array for the grid
-  array_board = checkers_create_grid();
-  printf("test %d\n", array_get(array_board, 0,1));
-
 
   gtk_window_set_title(GTK_WINDOW (window), "A squared square");
   gtk_window_set_default_size(GTK_WINDOW (window), 425, 460);
@@ -221,7 +226,7 @@ int main(int argc, char **argv) {
   g_object_unref(app);
 
   // don't forget to free the memory
-  free(array_board);
+  // free(array_board);
 
   return status;
 }
