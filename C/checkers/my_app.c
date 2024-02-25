@@ -11,15 +11,16 @@ static unsigned int canvas_width = 100;
 static unsigned int canvas_height = 100;
 static bool draw_square_status = FALSE;
 int array_board[64] = { 
-  0, 4, 0, 4, 0, 4, 0, 4,
-  4, 0, 4, 0, 4, 0, 4, 0,
-  0, 4, 0, 4, 0, 4, 0, 4,
-  0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 2, 0, 2, 0, 2, 0, 2,
   2, 0, 2, 0, 2, 0, 2, 0,
   0, 2, 0, 2, 0, 2, 0, 2,
-  2, 0, 2, 0, 2, 0, 1, 0
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  1, 0, 1, 0, 1, 0, 1, 0,
+  0, 1, 0, 1, 0, 1, 0, 1,
+  1, 0, 1, 0, 1, 0, 1, 0
 }; // pons: empty => 0; white => 2; black => 4
+
 
 static void on_quit_clicked (GtkWidget *widget, gpointer data){
   GApplication *app = G_APPLICATION(data); // Cast the user_data to GApplication
@@ -100,27 +101,29 @@ static void display_board(cairo_t *cr){
   const unsigned int to_center_x = size_x/2; // ditance between pos_x to center of the box
   const unsigned int to_center_y = size_y/2; 
   const unsigned int radius = (int) MIN(size_x, size_y)/2.5;
-  const unsigned int golden_radius = radius/2; // do differenciate picies that can come back
+  const unsigned int golden_radius = radius/2; // do differenciate pawns that can come back
 
   int current_pawn;
-  for (int row = 0; row < 8; row++){
-    for (int col = 0; col < 8; col++){
+  for (unsigned int row = 0; row < 8; row++){
+    for (unsigned int col = 0; col < 8; col++){
+      // display a black square
       if ((row + col) % 2 == 1){
         cairo_set_source_rgb(cr, 0, 0, 0);
         cairo_rectangle(cr, pos_x, pos_y, size_x, size_y);
         cairo_fill(cr);
       }
 
-      current_pawn = array_board[row*8+col];
+      current_pawn = array_get(array_board,row,col);
+      // display the current pawn
       if (current_pawn != 0){
-        if (current_pawn == 4 || current_pawn == 3) 
+        if (current_pawn == 2 || current_pawn == -2) 
           {cairo_set_source_rgb(cr, 0.2, 0.2, 0.2);}
-        else if (current_pawn == 2 || current_pawn == 1) 
+        else if (current_pawn == 1 || current_pawn == -1) 
           {cairo_set_source_rgb(cr, 0.7, 0.7, 0.7);}
         cairo_arc(cr, pos_x+to_center_x, pos_y+to_center_y, radius, 0, 2 * G_PI);
         cairo_fill(cr);
 
-        if ((current_pawn%2) == 1){
+        if (current_pawn < 0){
           cairo_set_source_rgb(cr, 1.0, 0.75, 0.0);
           cairo_arc(cr, pos_x+to_center_x, pos_y+to_center_y, golden_radius, 0, 2 * G_PI);
           cairo_fill(cr);
