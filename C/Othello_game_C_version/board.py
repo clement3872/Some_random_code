@@ -23,7 +23,7 @@ class Board(object):
 		]
 		subprocess.call(["gcc", "processing.c", "-o", "a.out"]) # compiling C file, output: a.out
 
-	def get(self, row, col):
+	def get(self, col, row):
 		return self.board_list[row*8 + col]
 
 	def calculate(self,i,j):
